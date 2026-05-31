@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alçı Karışım Hesaplayıcı</title>
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --surface2: #f0ede6;
+    --border: #e0dbd0;
+    --text: #1a1a1a;
+    --text2: #6b6560;
+    --text3: #a09890;
+    --teal: #1D9E75;
+    --teal-light: #E1F5EE;
+    --teal-border: #9FE1CB;
+    --teal-dark: #085041;
+    --purple: #7F77DD;
+    --blue: #378ADD;
+    --amber: #EF9F27;
+    --amber-light: #FAEEDA;
+    --amber-border: #FAC775;
+    --amber-dark: #633806;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .container {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* WATERMARK */
+  .watermark-strip {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 0.6rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    user-select: none;
+  }
+  .watermark-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .watermark-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--teal);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.7); }
+  }
+  .watermark-text {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.04em;
+  }
+  .watermark-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--teal);
+    letter-spacing: 0.03em;
+  }
+  .watermark-badge {
+    font-size: 10px;
+    background: rgba(29,158,117,0.15);
+    color: var(--teal);
+    border: 1px solid rgba(29,158,117,0.3);
+    border-radius: 20px;
+    padding: 2px 8px;
+    letter-spacing: 0.05em;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .app-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .app-subtitle {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .shape-btns {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .shape-btn {
+    padding: 6px 14px;
+    font-size: 13px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .shape-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .shape-btn.active {
+    background: var(--text);
+    color: #fff;
+    border-color: var(--text);
+  }
+
+  .shape-inputs {
+    display: none;
+  }
+  .shape-inputs.active {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .input-group { display: flex; flex-direction: column; gap: 5px; }
+  .input-group label { font-size: 12px; color: var(--text2); }
+  .input-row { display: flex; align-items: center; gap: 6px; }
+  .input-row input {
+    width: 90px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--surface);
+    transition: border-color 0.15s;
+    outline: none;
+  }
+  .input-row input:focus { border-color: var(--teal); }
+  .unit { font-size: 12px; color: var(--text3); }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.25rem 0;
+  }
+
+  /* TOGGLE */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .toggle-info p:first-child { font-size: 14px; color: var(--text); margin-bottom: 2px; }
+  .toggle-info p:last-child { font-size: 12px; color: var(--text2); }
+  .toggle-wrap { position: relative; width: 44px; height: 26px; flex-shrink: 0; cursor: pointer; }
+  .toggle-wrap input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle-track {
+    position: absolute; inset: 0;
+    background: var(--border);
+    border-radius: 13px;
+    transition: background 0.2s;
+  }
+  .toggle-thumb {
+    position: absolute;
+    width: 20px; height: 20px;
+    top: 3px; left: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: left 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle-wrap input:checked ~ .toggle-track { background: var(--teal); }
+  .toggle-wrap input:checked ~ .toggle-track .toggle-thumb { left: 21px; }
+
+  /* RATIO BAR */
+  .ratio-bar {
+    display: flex;
+    height: 18px;
+    border-radius: 4px;
+    overflow: hidden;
+    gap: 2px;
+    margin-bottom: 8px;
+  }
+  .ratio-seg {
+    transition: flex 0.4s cubic-bezier(0.4,0,0.2,1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.9);
+    letter-spacing: 0.03em;
+  }
+
+  /* RESULTS */
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin: 1.25rem 0 1rem;
+  }
+  .metric-card {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 0.875rem;
+    border: 1px solid transparent;
+  }
+  .metric-card.water {
+    background: var(--teal-light);
+    border-color: var(--teal-border);
+  }
+  .metric-card.fire {
+    background: var(--amber-light);
+    border-color: var(--amber-border);
+  }
+  .metric-label {
+    font-size: 11px;
+    color: var(--text2);
+    margin-bottom: 5px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .metric-card.water .metric-label { color: var(--teal-dark); }
+  .metric-card.fire .metric-label { color: var(--amber-dark); }
+  .metric-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1;
+  }
+  .metric-card.water .metric-value { color: var(--teal-dark); }
+  .metric-card.fire .metric-value { color: var(--amber-dark); }
+  .metric-unit {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text2);
+    margin-left: 2px;
+  }
+
+  /* INFO BOX */
+  .info-box {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.8;
+  }
+  .info-box strong { color: var(--text); }
+  .badge-ok {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 7px;
+    border-radius: 10px;
+    background: var(--teal-light);
+    color: var(--teal-dark);
+    border: 1px solid var(--teal-border);
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11px; color: var(--text2);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 1.5rem;
+    user-select: none;
+  }
+
+  @media (max-width: 420px) {
+    body { padding: 1rem 0.75rem 3rem; }
+    .metric-value { font-size: 20px; }
+  }
+</style>
+<meta name="author" content="Yusuf Can Güngör">
+<meta name="copyright" content="© Yusuf Can Güngör. All rights reserved.">
+<style>
+  ::selection { background: transparent; }
+  body { -webkit-user-select: none; -moz-user-select: none; user-select: none; }
+  input { -webkit-user-select: text !important; user-select: text !important; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- WATERMARK STRIP -->
+  <div class="watermark-strip" title="This application was designed and developed by Yusuf Can Güngör. Unauthorized copying or redistribution is not permitted.">
+    <div class="watermark-left">
+      <div class="watermark-dot"></div>
+      <span class="watermark-text">Designed &amp; built by</span>
+      <span class="watermark-name">Yusuf Can Güngör</span>
+    </div>
+    <span class="watermark-badge">© Original</span>
+  </div>
+
+  <!-- MAIN CARD -->
+  <div class="card">
+    <p class="app-title">Alçı Karışım Hesaplayıcı</p>
+    <p class="app-subtitle">Kalıp ölçülerini gir, gereken malzeme miktarlarını anında hesapla. Karışım kalıp hacminin %3 fazlası olarak hazırlanır.</p>
+
+    <p class="section-label">Kalıp şekli</p>
+    <div class="shape-btns">
+      <button class="shape-btn active" onclick="setShape('kutu')" id="btn-kutu">Dikdörtgen kutu</button>
+      <button class="shape-btn" onclick="setShape('silindir')" id="btn-silindir">Silindir</button>
+      <button class="shape-btn" onclick="setShape('manuel')" id="btn-manuel">Hacim gir</button>
+    </div>
+
+    <div class="shape-inputs active" id="inputs-kutu">
+      <div class="input-group">
+        <label>En</label>
+        <div class="input-row">
+          <input type="number" id="en" value="10" min="0.1" step="0.1" oninput="hesapla()">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Boy</label>
+        <div class="input-row">
+          <input type="number" id="boy" value="10" min="0.1" step="0.1" oninput="hesapla()">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Yükseklik</label>
+        <div class="input-row">
+          <input type="number" id="yukseklik" value="10" min="0.1" step="0.1" oninput="hesapla()">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="shape-inputs" id="inputs-silindir">
+      <div class="input-group">
+        <label>Yarıçap</label>
+        <div class="input-row">
+          <input type="number" id="radius" value="5" min="0.1" step="0.1" oninput="hesapla()">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Yükseklik</label>
+        <div class="input-row">
+          <input type="number" id="sil-yukseklik" value="10" min="0.1" step="0.1" oninput="hesapla()">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="shape-inputs" id="inputs-manuel">
+      <div class="input-group">
+        <label>Kalıp hacmi</label>
+        <div class="input-row">
+          <input type="number" id="manuel-hacim" value="1000" min="1" step="1" oninput="hesapla()">
+          <span class="unit">cm³</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <p>Pişmiş alçı ekle</p>
+        <p>Toplam karışımın yaklaşık %10'u</p>
+      </div>
+      <label class="toggle-wrap">
+        <input type="checkbox" id="pisalci-toggle" onchange="hesapla()">
+        <div class="toggle-track">
+          <div class="toggle-thumb"></div>
+        </div>
+      </label>
+    </div>
+
+    <hr class="divider">
+
+    <p class="section-label">Sonuçlar</p>
+
+    <div class="ratio-bar">
+      <div class="ratio-seg" id="bar-su" style="flex:2;background:#378ADD;">Su</div>
+      <div class="ratio-seg" id="bar-alci" style="flex:0.62;background:#7F77DD;">Alçı</div>
+      <div class="ratio-seg" id="bar-kuvars" style="flex:0.62;background:#5DCAA5;">Kuvars</div>
+      <div class="ratio-seg" id="bar-pisalci" style="flex:0;background:#EF9F27;display:none;"></div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#378ADD;"></div>Su</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#7F77DD;"></div>Alçı</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#5DCAA5;"></div>Kuvars</div>
+      <div class="legend-item" id="legend-pisalci" style="display:none;"><div class="legend-dot" style="background:#EF9F27;"></div>Pişmiş alçı</div>
+    </div>
+
+    <div class="results-grid">
+      <div class="metric-card water">
+        <div class="metric-label">💧 Su</div>
+        <div class="metric-value"><span id="su-val">—</span><span class="metric-unit">ml</span></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">🪨 Alçı</div>
+        <div class="metric-value"><span id="alci-val">—</span><span class="metric-unit">g</span></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">⚪ Kuvars</div>
+        <div class="metric-value"><span id="kuvars-val">—</span><span class="metric-unit">g</span></div>
+      </div>
+      <div class="metric-card fire" id="card-pisalci" style="display:none;">
+        <div class="metric-label">🔥 Pişmiş alçı</div>
+        <div class="metric-value"><span id="pisalci-val">—</span><span class="metric-unit">g</span></div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      Kalıp hacmi: <strong id="hacim-display">—</strong> cm³
+      &nbsp;·&nbsp;
+      Hedef karışım: <strong id="hedef-display">—</strong> cm³
+      <span class="badge-ok">%3 fazla</span>
+      <br>
+      Alçı = Kuvars (50/50) ✓
+      &nbsp;·&nbsp;
+      Su × 1.6 = Alçı + Kuvars ✓
+    </div>
+  </div>
+
+  <div class="footer">Alçı Karışım Hesaplayıcı · Tüm hakları saklıdır</div>
+</div>
+
+<script>
+var _$a=["a3V0dQ==","a3V0dQ==","c2lsaW5kaXI=","bWFudWVs","YnRuLQ==","YWN0aXZl","aW5wdXRzLQ==","YWN0aXZl","a3V0dQ==","ZW4=","Ym95","eXVrc2VrbGlr","c2lsaW5kaXI=","cmFkaXVz","c2lsLXl1a3Nla2xpaw==","bWFudWVsLWhhY2lt","cGlzYWxjaS10b2dnbGU=","c3UtdmFs","YWxjaS12YWw=","a3V2YXJzLXZhbA==","cGlzYWxjaS12YWw=","aGFjaW0tZGlzcGxheQ==","aGVkZWYtZGlzcGxheQ==","Y2FyZC1waXNhbGNp","bm9uZQ==","YmFyLXBpc2FsY2k=","bm9uZQ==","bGVnZW5kLXBpc2FsY2k=","bm9uZQ==","YmFyLXN1","YmFyLWFsY2k=","YmFyLWt1dmFycw==","YmFyLXBpc2FsY2k=","Y29udGV4dG1lbnU=","a2V5ZG93bg==","RjEy"];
+function _$s(i){try{return atob(_$a[i])}catch(e){return _$a[i]}}
+var _s = _$s(0);
+
+function setShape(s) {
+  _s = s;
+  [_$s(1),_$s(2),_$s(3)].forEach(function(sh) {
+    document.getElementById(_$s(4)+sh).classList.toggle(_$s(5), sh===s);
+    document.getElementById(_$s(6)+sh).classList.toggle(_$s(7), sh===s);
+  });
+  hesapla();
+}
+
+function _v() {
+  if (_s === _$s(8)) {
+    var a = parseFloat(document.getElementById(_$s(9)).value)||0;
+    var b = parseFloat(document.getElementById(_$s(10)).value)||0;
+    var c = parseFloat(document.getElementById(_$s(11)).value)||0;
+    return a*b*c;
+  } else if (_s === _$s(12)) {
+    var r = parseFloat(document.getElementById(_$s(13)).value)||0;
+    var h = parseFloat(document.getElementById(_$s(14)).value)||0;
+    return Math.PI*r*r*h;
+  } else {
+    return parseFloat(document.getElementById(_$s(15)).value)||0;
+  }
+}
+
+function hesapla() {
+  var V = _v();
+  var _pa = document.getElementById(_$s(16)).checked;
+  var _hd = V * 1.03;
+  var su, _al, _kv, _pa2;
+
+  if (!_pa) {
+    var _sh = (2/3)*V;
+    var _th = _sh + _sh*1.6;
+    var sc = _hd/_th;
+    su = _sh*sc;
+    var _ak = su*1.6;
+    _al = _ak/2;
+    _kv = _ak/2;
+    _pa2 = 0;
+  } else {
+    var _sh = (2/3)*V;
+    var _th = (_sh*2.6)/0.9;
+    var sc = _hd/_th;
+    su = _sh*sc;
+    var _ak = su*1.6;
+    _al = _ak/2;
+    _kv = _ak/2;
+    _pa2 = (su+_al+_kv)/0.9*0.1;
+  }
+
+  document.getElementById(_$s(17)).textContent = Math.round(su);
+  document.getElementById(_$s(18)).textContent = Math.round(_al);
+  document.getElementById(_$s(19)).textContent = Math.round(_kv);
+  document.getElementById(_$s(20)).textContent = Math.round(_pa2);
+  document.getElementById(_$s(21)).textContent = Math.round(V);
+  document.getElementById(_$s(22)).textContent = Math.round(_hd);
+
+  document.getElementById(_$s(23)).style.display = _pa ? '' : _$s(24);
+  document.getElementById(_$s(25)).style.display = _pa ? '' : _$s(26);
+  document.getElementById(_$s(27)).style.display = _pa ? '' : _$s(28);
+
+  var _bt = su+_al+_kv+(_pa?_pa2:0);
+  if (_bt > 0) {
+    document.getElementById(_$s(29)).style.flex = (su/_bt*10).toFixed(3);
+    document.getElementById(_$s(30)).style.flex = (_al/_bt*10).toFixed(3);
+    document.getElementById(_$s(31)).style.flex = (_kv/_bt*10).toFixed(3);
+    if (_pa) document.getElementById(_$s(32)).style.flex = (_pa2/_bt*10).toFixed(3);
+  }
+}
+
+// Sağ tık ve geliştirici araçlarını engelle
+document.addEventListener(_$s(33), function(e){ e.preventDefault(); return false; });
+document.addEventListener(_$s(34), function(e){
+  if (e.key===_$s(35)) { e.preventDefault(); return false; }
+  if (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) { e.preventDefault(); return false; }
+  if (e.ctrlKey && e.key==='U') { e.preventDefault(); return false; }
+  if (e.ctrlKey && e.key==='S') { e.preventDefault(); return false; }
+});
+// DevTools açık mı kontrolü
+(function(){
+  var t=setInterval(function(){
+    var d=new Date();
+    debugger;
+    if(new Date()-d>100){
+      document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#666;font-size:14px;">Bu uygulama geliştirici araçlarıyla kullanılamaz.</div>';
+      clearInterval(t);
+    }
+  },1000);
+})();
+
+hesapla();
+</script>
+</body>
+</html>
