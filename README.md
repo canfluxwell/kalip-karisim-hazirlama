@@ -1,0 +1,1 @@
+# kalip-karisim-hazirlama
