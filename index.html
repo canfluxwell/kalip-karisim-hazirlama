@@ -6,23 +6,21 @@
 <title>Alçı Karışım Hesaplayıcı</title>
 <style>
   :root {
-    --bg: #f7f5f0;
-    --surface: #ffffff;
-    --surface2: #f0ede6;
-    --border: #e0dbd0;
-    --text: #1a1a1a;
-    --text2: #6b6560;
-    --text3: #a09890;
-    --teal: #1D9E75;
-    --teal-light: #E1F5EE;
-    --teal-border: #9FE1CB;
-    --teal-dark: #085041;
-    --purple: #7F77DD;
-    --blue: #378ADD;
-    --amber: #EF9F27;
-    --amber-light: #FAEEDA;
-    --amber-border: #FAC775;
-    --amber-dark: #633806;
+    /* Genel Renkler */
+    --bg: #111a24;
+    --surface: #1e3545;
+    --surface2: #223d4c;
+    --border: rgba(226, 247, 252, 0.15);
+    
+    /* Metin Renkleri */
+    --text: #e2f7fc;
+    --text2: rgba(226, 247, 252, 0.7);
+    --text3: rgba(226, 247, 252, 0.5);
+    
+    /* Özel Vurgular */
+    --pismis: #ff410d;
+    --sonuclar: #f4af2d;
+
     --radius: 10px;
     --radius-sm: 6px;
   }
@@ -35,16 +33,32 @@
     color: var(--text);
     min-height: 100vh;
     padding: 2rem 1rem 4rem;
+    position: relative;
+  }
+
+  /* CANVAS PLEXUS ARKA PLAN */
+  #plexus-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
   }
 
   .container {
     max-width: 560px;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
   }
 
   /* WATERMARK */
   .watermark-strip {
-    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    background: #162633;
+    border: 1px solid var(--border);
+    border-bottom: none;
     border-radius: var(--radius) var(--radius) 0 0;
     padding: 0.6rem 1.25rem;
     display: flex;
@@ -60,7 +74,8 @@
   }
   .watermark-dot {
     width: 8px; height: 8px; border-radius: 50%;
-    background: var(--teal);
+    background: var(--text);
+    box-shadow: 0 0 8px var(--text);
     animation: pulse-dot 2s ease-in-out infinite;
   }
   @keyframes pulse-dot {
@@ -69,20 +84,20 @@
   }
   .watermark-text {
     font-size: 11px;
-    color: rgba(255,255,255,0.5);
+    color: var(--pismis);
     letter-spacing: 0.04em;
   }
   .watermark-name {
     font-size: 12px;
     font-weight: 600;
-    color: var(--teal);
+    color: var(--text);
     letter-spacing: 0.03em;
   }
   .watermark-badge {
     font-size: 10px;
-    background: rgba(29,158,117,0.15);
-    color: var(--teal);
-    border: 1px solid rgba(29,158,117,0.3);
+    background: rgba(226, 247, 252, 0.05);
+    color: var(--text);
+    border: 1px solid rgba(226, 247, 252, 0.3);
     border-radius: 20px;
     padding: 2px 8px;
     letter-spacing: 0.05em;
@@ -95,6 +110,7 @@
     border-radius: 0 0 var(--radius) var(--radius);
     padding: 1.5rem;
     margin-bottom: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   }
 
   .app-title {
@@ -130,16 +146,16 @@
     font-size: 13px;
     border: 1px solid var(--border);
     border-radius: 20px;
-    background: var(--surface);
+    background: var(--surface2);
     color: var(--text2);
     cursor: pointer;
     transition: all 0.15s;
     font-family: inherit;
   }
-  .shape-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .shape-btn:hover { border-color: var(--text); color: var(--text); }
   .shape-btn.active {
     background: var(--text);
-    color: #fff;
+    color: var(--surface);
     border-color: var(--text);
   }
 
@@ -164,11 +180,11 @@
     font-size: 14px;
     font-family: inherit;
     color: var(--text);
-    background: var(--surface);
+    background: var(--surface2);
     transition: border-color 0.15s;
     outline: none;
   }
-  .input-row input:focus { border-color: var(--teal); }
+  .input-row input:focus { border-color: var(--text); }
   .unit { font-size: 12px; color: var(--text3); }
 
   .divider {
@@ -177,34 +193,35 @@
     margin: 1.25rem 0;
   }
 
-  /* TOGGLE */
+  /* TOGGLE & PIŞMİŞ ALÇI ALANI */
   .toggle-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
   }
-  .toggle-info p:first-child { font-size: 14px; color: var(--text); margin-bottom: 2px; }
-  .toggle-info p:last-child { font-size: 12px; color: var(--text2); }
+  .toggle-info p:first-child { font-size: 14px; color: var(--pismis); margin-bottom: 2px; font-weight: 600;}
+  .toggle-info p:last-child { font-size: 12px; color: rgba(255, 65, 13, 0.8); }
   .toggle-wrap { position: relative; width: 44px; height: 26px; flex-shrink: 0; cursor: pointer; }
   .toggle-wrap input { opacity: 0; width: 0; height: 0; position: absolute; }
   .toggle-track {
     position: absolute; inset: 0;
-    background: var(--border);
+    background: var(--surface2);
+    border: 1px solid var(--border);
     border-radius: 13px;
-    transition: background 0.2s;
+    transition: background 0.2s, border-color 0.2s;
   }
   .toggle-thumb {
     position: absolute;
     width: 20px; height: 20px;
-    top: 3px; left: 3px;
-    background: #fff;
+    top: 2px; left: 2px;
+    background: var(--text);
     border-radius: 50%;
     transition: left 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
   }
-  .toggle-wrap input:checked ~ .toggle-track { background: var(--teal); }
-  .toggle-wrap input:checked ~ .toggle-track .toggle-thumb { left: 21px; }
+  .toggle-wrap input:checked ~ .toggle-track { background: var(--pismis); border-color: var(--pismis); }
+  .toggle-wrap input:checked ~ .toggle-track .toggle-thumb { left: 20px; background: #fff;}
 
   /* RATIO BAR */
   .ratio-bar {
@@ -214,6 +231,7 @@
     overflow: hidden;
     gap: 2px;
     margin-bottom: 8px;
+    background: var(--surface2);
   }
   .ratio-seg {
     transition: flex 0.4s cubic-bezier(0.4,0,0.2,1);
@@ -233,36 +251,40 @@
     background: var(--surface2);
     border-radius: var(--radius-sm);
     padding: 0.875rem;
-    border: 1px solid transparent;
+    border: 1px solid var(--border);
   }
-  .metric-card.water {
-    background: var(--teal-light);
-    border-color: var(--teal-border);
+  
+  /* Sonuç Metinleri (Pişmiş Alçı Hariç) */
+  .results-grid .metric-card:not(.fire) .metric-label,
+  .results-grid .metric-card:not(.fire) .metric-value,
+  .results-grid .metric-card:not(.fire) .metric-unit {
+    color: var(--sonuclar) !important;
   }
+
+  /* Pişmiş Alçı Sonuç Kartı */
   .metric-card.fire {
-    background: var(--amber-light);
-    border-color: var(--amber-border);
+    background: rgba(255, 65, 13, 0.08);
+    border-color: rgba(255, 65, 13, 0.3);
   }
+  .metric-card.fire .metric-label,
+  .metric-card.fire .metric-value,
+  .metric-card.fire .metric-unit {
+    color: var(--pismis) !important;
+  }
+
   .metric-label {
     font-size: 11px;
-    color: var(--text2);
     margin-bottom: 5px;
     display: flex; align-items: center; gap: 5px;
   }
-  .metric-card.water .metric-label { color: var(--teal-dark); }
-  .metric-card.fire .metric-label { color: var(--amber-dark); }
   .metric-value {
     font-size: 24px;
     font-weight: 600;
-    color: var(--text);
     line-height: 1;
   }
-  .metric-card.water .metric-value { color: var(--teal-dark); }
-  .metric-card.fire .metric-value { color: var(--amber-dark); }
   .metric-unit {
     font-size: 12px;
     font-weight: 400;
-    color: var(--text2);
     margin-left: 2px;
   }
 
@@ -270,21 +292,21 @@
   .info-box {
     background: var(--surface2);
     border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(244, 175, 45, 0.2);
     padding: 0.75rem 1rem;
     font-size: 12px;
-    color: var(--text2);
+    color: var(--sonuclar);
     line-height: 1.8;
   }
-  .info-box strong { color: var(--text); }
+  .info-box strong { color: var(--sonuclar); }
   .badge-ok {
     display: inline-block;
     font-size: 10px;
     padding: 1px 7px;
     border-radius: 10px;
-    background: var(--teal-light);
-    color: var(--teal-dark);
-    border: 1px solid var(--teal-border);
+    background: rgba(244, 175, 45, 0.15);
+    color: var(--sonuclar);
+    border: 1px solid rgba(244, 175, 45, 0.3);
     margin-left: 4px;
     vertical-align: middle;
   }
@@ -322,16 +344,17 @@
 <meta name="author" content="Yusuf Can Güngör">
 <meta name="copyright" content="© Yusuf Can Güngör. All rights reserved.">
 <style>
-  ::selection { background: transparent; }
+  ::selection { background: rgba(226, 247, 252, 0.2); }
   body { -webkit-user-select: none; -moz-user-select: none; user-select: none; }
   input { -webkit-user-select: text !important; user-select: text !important; }
 </style>
 </head>
 <body>
 
+<canvas id="plexus-canvas"></canvas>
+
 <div class="container">
 
-  <!-- WATERMARK STRIP -->
   <div class="watermark-strip" title="This application was designed and developed by Yusuf Can Güngör. Unauthorized copying or redistribution is not permitted.">
     <div class="watermark-left">
       <div class="watermark-dot"></div>
@@ -341,7 +364,6 @@
     <span class="watermark-badge">© Original</span>
   </div>
 
-  <!-- MAIN CARD -->
   <div class="card">
     <p class="app-title">Alçı Karışım Hesaplayıcı</p>
     <p class="app-subtitle">Kalıp ölçülerini gir, gereken malzeme miktarlarını anında hesapla. Karışım kalıp hacminin %3 fazlası olarak hazırlanır.</p>
@@ -427,14 +449,14 @@
       <div class="ratio-seg" id="bar-su" style="flex:2;background:#378ADD;">Su</div>
       <div class="ratio-seg" id="bar-alci" style="flex:0.62;background:#7F77DD;">Alçı</div>
       <div class="ratio-seg" id="bar-kuvars" style="flex:0.62;background:#5DCAA5;">Kuvars</div>
-      <div class="ratio-seg" id="bar-pisalci" style="flex:0;background:#EF9F27;display:none;"></div>
+      <div class="ratio-seg" id="bar-pisalci" style="flex:0;background:var(--pismis);display:none;"></div>
     </div>
 
     <div class="legend">
       <div class="legend-item"><div class="legend-dot" style="background:#378ADD;"></div>Su</div>
       <div class="legend-item"><div class="legend-dot" style="background:#7F77DD;"></div>Alçı</div>
       <div class="legend-item"><div class="legend-dot" style="background:#5DCAA5;"></div>Kuvars</div>
-      <div class="legend-item" id="legend-pisalci" style="display:none;"><div class="legend-dot" style="background:#EF9F27;"></div>Pişmiş alçı</div>
+      <div class="legend-item" id="legend-pisalci" style="display:none; color: var(--pismis);"><div class="legend-dot" style="background:var(--pismis);"></div>Pişmiş alçı</div>
     </div>
 
     <div class="results-grid">
@@ -472,6 +494,70 @@
 </div>
 
 <script>
+// PLEXUS ANİMASYONU (Yoğun, örümcek ağı benzeri hacking stili)
+const canvas = document.getElementById('plexus-canvas');
+const ctx = canvas.getContext('2d');
+let width, height, particles;
+
+function initPlexus() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+    particles = [];
+    
+    // Ağın çok daha yoğun ve karmaşık olması için yüksek parçacık sayısı
+    const particleCount = Math.floor((width * height) / 5500); 
+    for (let i = 0; i < particleCount; i++) {
+        particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            radius: Math.random() * 1.5 + 0.5
+        });
+    }
+}
+
+function drawPlexus() {
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = '#e2f7fc';
+    ctx.lineWidth = 0.5;
+
+    for (let i = 0; i < particles.length; i++) {
+        let p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        for (let j = i + 1; j < particles.length; j++) {
+            let p2 = particles[j];
+            let dx = p.x - p2.x;
+            let dy = p.y - p2.y;
+            let dist = dx * dx + dy * dy;
+
+            // Örümcek ağı görünümü için dar bağlantı mesafesi
+            if (dist < 7500) {
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(226, 247, 252, ${1 - dist / 7500})`;
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.stroke();
+            }
+        }
+    }
+    requestAnimationFrame(drawPlexus);
+}
+
+window.addEventListener('resize', initPlexus);
+initPlexus();
+drawPlexus();
+
+// ORİJİNAL HESAPLAMA VE GÜVENLİK KODLARI
 var _$a=["a3V0dQ==","a3V0dQ==","c2lsaW5kaXI=","bWFudWVs","YnRuLQ==","YWN0aXZl","aW5wdXRzLQ==","YWN0aXZl","a3V0dQ==","ZW4=","Ym95","eXVrc2VrbGlr","c2lsaW5kaXI=","cmFkaXVz","c2lsLXl1a3Nla2xpaw==","bWFudWVsLWhhY2lt","cGlzYWxjaS10b2dnbGU=","c3UtdmFs","YWxjaS12YWw=","a3V2YXJzLXZhbA==","cGlzYWxjaS12YWw=","aGFjaW0tZGlzcGxheQ==","aGVkZWYtZGlzcGxheQ==","Y2FyZC1waXNhbGNp","bm9uZQ==","YmFyLXBpc2FsY2k=","bm9uZQ==","bGVnZW5kLXBpc2FsY2k=","bm9uZQ==","YmFyLXN1","YmFyLWFsY2k=","YmFyLWt1dmFycw==","YmFyLXBpc2FsY2k=","Y29udGV4dG1lbnU=","a2V5ZG93bg==","RjEy"];
 function _$s(i){try{return atob(_$a[i])}catch(e){return _$a[i]}}
 var _s = _$s(0);
@@ -546,7 +632,6 @@ function hesapla() {
   }
 }
 
-// Sağ tık ve geliştirici araçlarını engelle
 document.addEventListener(_$s(33), function(e){ e.preventDefault(); return false; });
 document.addEventListener(_$s(34), function(e){
   if (e.key===_$s(35)) { e.preventDefault(); return false; }
@@ -554,7 +639,7 @@ document.addEventListener(_$s(34), function(e){
   if (e.ctrlKey && e.key==='U') { e.preventDefault(); return false; }
   if (e.ctrlKey && e.key==='S') { e.preventDefault(); return false; }
 });
-// DevTools açık mı kontrolü
+
 (function(){
   var t=setInterval(function(){
     var d=new Date();
